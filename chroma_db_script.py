@@ -5,14 +5,10 @@ from langchain_openai import OpenAIEmbeddings
 from langchain.vectorstores.chroma import Chroma
 import os
 import shutil
+import json
 
 CHROMA_PATH = "chroma"
 DATA_PATH = "data"
-
-
-# def main():
-#     generate_data_store()
-
 
 def generate_data_store():
     documents = load_documents()
@@ -28,15 +24,15 @@ def load_documents():
 
 def split_text(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
+        chunk_size=750,
         chunk_overlap=100,
         length_function=len,
         add_start_index=True,
     )
     chunks = text_splitter.split_documents(documents)
-    #print(f"Split {len(documents)} documents into {len(chunks)} chunks.")
+    print(f"Split {len(documents)} documents into {len(chunks)} chunks.")
 
-    document = chunks[10]
+    #document = chunks[10]
     #print(document.page_content)
     #print(document.metadata)
 
@@ -49,10 +45,10 @@ def save_to_chroma(chunks: list[Document]):
 
     # Create a new DB from the documents.
     db = Chroma.from_documents(
-        chunks, OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY), persist_directory=CHROMA_PATH
+        chunks, OpenAIEmbeddings(), persist_directory=CHROMA_PATH
     )
     db.persist()
-    #print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
+    print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
 
 # if __name__ == "__main__":
