@@ -10,6 +10,27 @@ from langchain.load import dumps, loads
 CHROMA_PATH = "chroma"
 DATA_PATH = "data"
 embedding_function = OpenAIEmbeddings()
+def simple(query_text):
+    PROMPT_TEMPLATE = """
+    Answer the question based only on the following context:
+
+    {context}
+
+    ---
+
+    Answer the question based on the above context: {question}
+    """
+
+    prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+
+    llm = ChatOpenAI(temperature=0)
+
+    final_rag_chain = (prompt | llm | StrOutputParser())
+
+    with open("data/data0.txt", 'r', errors='ignore') as file:
+        file_contents = file.read()
+
+    return final_rag_chain.invoke({"context": file_contents, "question": query_text})
 
 def reciprocal_rank_fusion(query_text):
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
@@ -71,6 +92,7 @@ def reciprocal_rank_fusion(query_text):
 
 def similarity_search(query_text):
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
+    
     PROMPT_TEMPLATE = """
     Answer the question based only on the following context:
 
